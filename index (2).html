@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kuis Transformasi - Kelas 9 MTs</title>
+<style>
+:root{--bg:#fff;--tx:#111;--card:#fff;--bl:#0b3d91;--rd:#b71c1c;--gr:#1b5e20;--ln:#222;--soft:#eef3fb;--okb:#e3f6e5;--okt:#0d3b12;--badb:#fde8e8;--badt:#6b0f0f;--mb:#0b3d91;--mt:#fff;--sf:#fffafa;--bd2:#999;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1116;--tx:#f2f4f8;--card:#161b22;--bl:#8ab4ff;--rd:#ff8a80;--gr:#7ddc86;--ln:#8b949e;--soft:#1c2536;--okb:#12301a;--okt:#d6f5da;--badb:#3a1616;--badt:#ffd6d3;--mb:#8ab4ff;--mt:#0e1116;--sf:#1d1517;--bd2:#6e7681}}
+:root[data-theme="dark"]{--bg:#0e1116;--tx:#f2f4f8;--card:#161b22;--bl:#8ab4ff;--rd:#ff8a80;--gr:#7ddc86;--ln:#8b949e;--soft:#1c2536;--okb:#12301a;--okt:#d6f5da;--badb:#3a1616;--badt:#ffd6d3;--mb:#8ab4ff;--mt:#0e1116;--sf:#1d1517;--bd2:#6e7681}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Arial,Helvetica,sans-serif;font-size:19px;line-height:1.5}
+main{max-width:720px;margin:0 auto;padding:14px}
+h1{font-size:1.45rem;color:var(--bl);margin:.2em 0}
+h2{font-size:1.25rem;color:var(--bl);margin:.3em 0}
+.card{border:3px solid var(--ln);border-radius:14px;padding:14px;margin:12px 0;background:var(--card)}
+.top{display:flex;justify-content:space-between;font-weight:bold;flex-wrap:wrap;gap:6px}
+.bar{height:14px;border:2px solid var(--ln);border-radius:8px;margin:6px 0 0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--bl);width:0;transition:width .3s}
+.tag{display:inline-block;background:var(--mb);color:var(--mt);border-radius:8px;padding:2px 10px;font-size:.8rem;font-weight:bold;margin-bottom:8px}
+.q{font-weight:bold;margin:6px 0 10px}
+svg{width:100%;max-width:420px;display:block;margin:0 auto;border:3px solid var(--ln);border-radius:10px}
+.leg{text-align:center;font-weight:bold;font-size:.85rem;margin:6px 0 10px}
+.leg span{margin:0 8px;white-space:nowrap}
+button{font:inherit;font-weight:bold;min-height:50px;padding:8px 16px;border:3px solid var(--bl);background:var(--card);color:var(--bl);border-radius:12px;cursor:pointer;text-align:left}
+button:focus{outline:4px solid #ffb300}
+.opt{display:block;width:100%;margin:8px 0}
+.opt.pilih,.chip.pilih{background:var(--soft);border-color:var(--tx);color:var(--tx);box-shadow:inset 0 0 0 3px var(--bl)}
+.opt.ok,.chip.ok{background:var(--okb);border-color:var(--gr);color:var(--okt)}
+.opt.bad,.chip.bad{background:var(--badb);border-color:var(--rd);color:var(--badt)}
+.opt.ok::after,.chip.ok::after{content:" \2713"}
+.opt.bad::after,.chip.bad::after{content:" \2717"}
+.kunci{pointer-events:none}
+.main{background:var(--mb);color:var(--mt);text-align:center}
+.row{margin:10px 0;padding:8px;border:2px solid var(--bd2);border-radius:10px}
+.chip{margin:4px 6px 4px 0;min-height:44px;padding:6px 12px}
+input[type=text],textarea{width:100%;font:inherit;padding:10px;border:3px solid var(--ln);border-radius:10px;color:var(--tx);background:var(--card)}
+textarea{min-height:110px}
+.fb{margin:12px 0;padding:10px 14px;border-radius:10px;border-left:10px solid var(--bl);background:var(--soft)}
+.fb.ok{border-color:var(--gr);background:var(--okb);color:var(--okt)}
+.fb.bad{border-color:var(--rd);background:var(--badb);color:var(--badt)}
+.msg{color:var(--rd);font-weight:bold;min-height:1.4em}
+.skor{font-size:2.4rem;font-weight:bold;color:var(--bl);text-align:center}
+.salah{border:2px solid var(--rd);border-radius:10px;padding:10px;margin:10px 0;background:var(--sf)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Kuis Transformasi</h1>
+<p><b>Matematika - Kelas 9 MTs.</b> Lihat gambar dan benda di sekitarmu. Jawabanmu langsung diperiksa.</p>
+<div class="card">
+  <div class="top"><span id="no"></span><span id="sk"></span></div>
+  <div class="bar"><i id="pb"></i></div>
+</div>
+<div id="app"></div>
+</main>
+
+<script>
+/* =====================================================
+   BAGIAN UNTUK GURU: edit soal di array SOAL di bawah.
+   Jenis (t):
+   "pg"     : pilihan ganda. opsi:[...], kunci: nomor opsi (mulai 0)
+   "pgk"    : pilihan ganda kompleks. opsi:[...], kunci:[nomor,...]
+   "bs"     : benar/salah. kunci: true atau false
+   "jodoh"  : menjodohkan (ketuk). kiri:[...], kanan:[...], kunci:[nomor kanan untuk tiap kiri]
+   "isian"  : isian singkat. kunci:["jawaban1","jawaban2"] (spasi, tanda kurung, huruf diabaikan)
+   "uraian" : uraian. kata:[[sinonim...],[...]], min: jumlah kelompok kata yang harus muncul, contoh:"jawaban contoh"
+   Gambar (fig): r = jarak kisi, bangun: [{p:[[x,y],...], c:"b" (biru) atau "m" (merah), n:["A","B"]}]
+   ===================================================== */
+var SOAL=[
+{t:"pg",q:"Segitiga biru ABC digeser menjadi segitiga merah A’B’C’. Translasi apa yang dilakukan?",
+ fig:{r:7,alt:"Segitiga biru digeser ke kanan dan ke atas",bangun:[{p:[[1,1],[3,1],[1,3]],c:"b",n:["A","B","C"]},{p:[[4,2],[6,2],[4,4]],c:"m",n:["A’","B’","C’"]}]},
+ opsi:["(3, 1)","(1, 3)","(-3, -1)","(3, -1)"],kunci:0,
+ bahas:"Lihat titik A(1, 1) menjadi A’(4, 2). Geser 3 ke kanan dan 1 ke atas. Jadi translasinya (3, 1)."},
+
+{t:"pg",q:"Segitiga merah adalah bayangan segitiga biru. Cermin apa yang dipakai?",
+ fig:{r:6,alt:"Dua segitiga saling berhadapan di kiri dan kanan sumbu y",bangun:[{p:[[1,1],[4,1],[1,3]],c:"b",n:["A","B","C"]},{p:[[-1,1],[-4,1],[-1,3]],c:"m",n:["A’","B’","C’"]}]},
+ opsi:["Sumbu x","Sumbu y","Garis y = x","Titik O"],kunci:1,
+ bahas:"Kedua segitiga ada di kiri dan kanan sumbu y. Tinggi titik sama. Jadi cerminnya sumbu y: (x, y) menjadi (-x, y)."},
+
+{t:"pg",q:"Segitiga biru diputar dengan pusat O menjadi segitiga merah. Berapa derajat putarannya, berlawanan arah jarum jam?",
+ fig:{r:5,alt:"Segitiga biru di kuadran I diputar ke kuadran II",bangun:[{p:[[2,1],[4,1],[2,2]],c:"b",n:["A","B","C"]},{p:[[-1,2],[-1,4],[-2,2]],c:"m",n:["A’","B’","C’"]}]},
+ opsi:["90\u00B0","180\u00B0","270\u00B0","45\u00B0"],kunci:0,
+ bahas:"Titik A(2, 1) menjadi A’(-1, 2). Aturan rotasi 90\u00B0 adalah (x, y) menjadi (-y, x). Cocok. Jadi putarannya 90\u00B0."},
+
+{t:"pgk",q:"Perhatikan gambar. Segitiga biru menjadi segitiga merah. Pilih SEMUA pernyataan yang benar.",
+ fig:{r:5,alt:"Segitiga kecil dan segitiga dua kali lebih besar dari pusat O",bangun:[{p:[[1,1],[2,1],[1,2]],c:"b",n:["A","B","C"]},{p:[[2,2],[4,2],[2,4]],c:"m",n:["A’","B’","C’"]}]},
+ opsi:["Ini dilatasi pusat O dengan faktor 2.","Sisi segitiga merah dua kali sisi segitiga biru.","Ukurannya sama, hanya bergeser.","Titik B(2, 1) menjadi B’(4, 2)."],kunci:[0,1,3],
+ bahas:"Setiap titik dikali 2: (x, y) menjadi (2x, 2y). Sisi menjadi dua kali lebih panjang. Pernyataan ketiga salah karena ukuran berubah."},
+
+{t:"bs",q:"Pada gambar, titik P’ adalah bayangan titik P setelah dicerminkan terhadap sumbu x.",
+ fig:{r:5,alt:"Titik P di atas sumbu x dan titik P’ di bawah sumbu x",bangun:[{p:[[3,2]],c:"b",n:["P"]},{p:[[3,-2]],c:"m",n:["P’"]}]},
+ kunci:true,
+ bahas:"P(3, 2) dan P’(3, -2) berjarak sama dari sumbu x, di sisi yang berlawanan. Itu refleksi terhadap sumbu x: (x, y) menjadi (x, -y)."},
+
+{t:"bs",q:"Segitiga merah adalah hasil rotasi 90\u00B0 pusat O dari segitiga biru.",
+ fig:{r:4,alt:"Segitiga biru di kuadran I dan segitiga merah di kuadran III",bangun:[{p:[[1,1],[3,1],[1,2]],c:"b",n:["A","B","C"]},{p:[[-1,-1],[-3,-1],[-1,-2]],c:"m",n:["A’","B’","C’"]}]},
+ kunci:false,
+ bahas:"A(1, 1) menjadi A’(-1, -1). Aturan (x, y) menjadi (-x, -y) adalah rotasi 180\u00B0. Rotasi 90\u00B0 akan memberi (-y, x)."},
+
+{t:"jodoh",q:"Jodohkan kejadian sehari-hari dengan jenis transformasinya. Ketuk satu jawaban untuk tiap baris.",
+ kiri:["Menggeser kursi ke kanan","Bayangan wajahmu di cermin","Memutar roda sepeda","Memperbesar foto di ponsel"],
+ kanan:["Translasi","Refleksi","Rotasi","Dilatasi"],kunci:[0,1,2,3],
+ bahas:"Geser = translasi. Cermin = refleksi. Putar = rotasi. Perbesar atau perkecil = dilatasi."},
+
+{t:"isian",q:"Titik A(2, 3) pada gambar digeser translasi (-4, 1). Tulis koordinat bayangan A’. Contoh penulisan: (1, 2)",
+ fig:{r:6,alt:"Titik A di kuadran I",bangun:[{p:[[2,3]],c:"b",n:["A"]}]},
+ kunci:["-2,4"],
+ bahas:"(2 + (-4), 3 + 1) = (-2, 4). Jadi A’(-2, 4)."},
+
+{t:"isian",q:"Titik B(-5, 2) pada gambar dicerminkan terhadap sumbu y. Tulis koordinat bayangan B’.",
+ fig:{r:6,alt:"Titik B di kuadran II",bangun:[{p:[[-5,2]],c:"b",n:["B"]}]},
+ kunci:["5,2"],
+ bahas:"Refleksi terhadap sumbu y: (x, y) menjadi (-x, y). Jadi B’(5, 2)."},
+
+{t:"uraian",q:"Gambar kecil (biru) diperbesar menjadi gambar merah dengan dilatasi pusat O faktor 3. Jelaskan dengan kalimatmu: apa yang berubah dan apa yang tetap?",
+ fig:{r:7,alt:"Segitiga kecil dan segitiga tiga kali lebih besar",bangun:[{p:[[1,1],[2,1],[1,2]],c:"b",n:["A","B","C"]},{p:[[3,3],[6,3],[3,6]],c:"m",n:["A’","B’","C’"]}]},
+ kata:[["ukuran","besar","panjang","membesar","diperbesar"],["bentuk","sebangun","serupa"],["tiga","3","kali","lipat"]],min:2,
+ contoh:"Ukuran gambar menjadi 3 kali lebih besar, sedangkan bentuknya tetap (sebangun).",
+ bahas:"Dilatasi mengubah ukuran. Setiap sisi menjadi 3 kali lebih panjang. Bentuk tetap sama, jadi kedua segitiga sebangun."}
+];
+/* ================= AKHIR BAGIAN GURU ================= */
+
+var JENIS={pg:"Pilihan ganda",pgk:"Pilihan ganda kompleks",bs:"Benar atau salah",jodoh:"Menjodohkan",isian:"Isian singkat",uraian:"Uraian"};
+var app=document.getElementById("app");
+var cur=0,done=false,skor=0,salah=[],st={};
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function qa(s){return Array.prototype.slice.call(app.querySelectorAll(s));}
+
+function gambar(f){
+  var R=f.r||7,u=24,W=2*R*u,o=R*u,i;
+  function X(x){return o+x*u;}
+  function Y(y){return o-y*u;}
+  var s='<svg viewBox="0 0 '+W+' '+W+'" role="img" aria-label="'+esc(f.alt||"Bidang koordinat")+'"><rect width="'+W+'" height="'+W+'" fill="#fff"/>';
+  for(i=-R;i<=R;i++){
+    s+='<line x1="'+X(i)+'" y1="0" x2="'+X(i)+'" y2="'+W+'" stroke="#bbb" stroke-width="1"/>';
+    s+='<line x1="0" y1="'+Y(i)+'" x2="'+W+'" y2="'+Y(i)+'" stroke="#bbb" stroke-width="1"/>';
+  }
+  s+='<line x1="0" y1="'+o+'" x2="'+W+'" y2="'+o+'" stroke="#111" stroke-width="2.5"/>';
+  s+='<line x1="'+o+'" y1="0" x2="'+o+'" y2="'+W+'" stroke="#111" stroke-width="2.5"/>';
+  for(i=-R+1;i<R;i++){
+    if(i!==0&&i%2===0){
+      s+='<text x="'+X(i)+'" y="'+(o+14)+'" font-size="11" font-weight="bold" text-anchor="middle" fill="#111">'+i+'</text>';
+      s+='<text x="'+(o-4)+'" y="'+(Y(i)+4)+'" font-size="11" font-weight="bold" text-anchor="end" fill="#111">'+i+'</text>';
+    }
+  }
+  s+='<text x="'+(W-4)+'" y="'+(o-6)+'" font-size="13" font-weight="bold" text-anchor="end" fill="#111">x</text>';
+  s+='<text x="'+(o+6)+'" y="13" font-size="13" font-weight="bold" fill="#111">y</text>';
+  f.bangun.forEach(function(b){
+    var col=b.c==="m"?"#b71c1c":"#0b3d91",fill=b.c==="m"?"rgba(183,28,28,.25)":"rgba(11,61,145,.25)";
+    var pts=b.p.map(function(p){return X(p[0])+","+Y(p[1]);}).join(" ");
+    if(b.p.length>2)s+='<polygon points="'+pts+'" fill="'+fill+'" stroke="'+col+'" stroke-width="3"/>';
+    b.p.forEach(function(p,k){
+      s+='<circle cx="'+X(p[0])+'" cy="'+Y(p[1])+'" r="4.5" fill="'+col+'"/>';
+      if(b.n&&b.n[k])s+='<text x="'+(X(p[0])+7)+'" y="'+(Y(p[1])-7)+'" font-size="15" font-weight="bold" fill="'+col+'">'+esc(b.n[k])+'</text>';
+    });
+  });
+  s+='</svg><div class="leg"><span style="color:#6aa0ff">&#9632; Biru = awal</span><span style="color:#ff6b61">&#9632; Merah = bayangan</span></div>';
+  return s;
+}
+
+function tampil(){
+  var q=SOAL[cur],h="";
+  done=false;
+  st={sel:null,set:[],bs:null,map:[],teks:""};
+  document.getElementById("no").textContent="Soal "+(cur+1)+" dari "+SOAL.length;
+  document.getElementById("sk").textContent="Skor: "+skor;
+  document.getElementById("pb").style.width=(cur/SOAL.length*100)+"%";
+  h+='<div class="card"><span class="tag">'+JENIS[q.t]+'</span>';
+  h+='<div class="q">'+q.q+'</div>';
+  if(q.fig)h+=gambar(q.fig);
+  if(q.t==="pg"){
+    q.opsi.forEach(function(o,k){h+='<button class="opt" data-i="'+k+'">'+String.fromCharCode(65+k)+". "+o+'</button>';});
+  }else if(q.t==="pgk"){
+    h+='<p><i>Boleh pilih lebih dari satu.</i></p>';
+    q.opsi.forEach(function(o,k){h+='<button class="opt" data-k="'+k+'" aria-pressed="false">'+String.fromCharCode(65+k)+". "+o+'</button>';});
+  }else if(q.t==="bs"){
+    h+='<button class="opt" data-v="1">Benar</button><button class="opt" data-v="0">Salah</button>';
+  }else if(q.t==="jodoh"){
+    q.kiri.forEach(function(l,r){
+      h+='<div class="row"><div><b>'+(r+1)+". "+l+'</b></div>';
+      q.kanan.forEach(function(k,c){h+='<button class="chip" data-r="'+r+'" data-c="'+c+'">'+k+'</button>';});
+      h+='</div>';
+    });
+  }else if(q.t==="isian"){
+    h+='<input type="text" id="inp" autocomplete="off" aria-label="Jawabanmu">';
+  }else{
+    h+='<textarea id="inp" aria-label="Jawabanmu" placeholder="Tulis jawabanmu di sini..."></textarea>';
+  }
+  h+='<div class="msg" id="msg" role="alert"></div>';
+  if(q.t!=="pg"&&q.t!=="bs")h+='<button class="main" id="cek" style="width:100%">Periksa Jawaban</button>';
+  h+='<div id="fb"></div><button class="main hide" id="nx" style="width:100%;margin-top:8px">'+(cur===SOAL.length-1?"Lihat Skor":"Soal Berikutnya")+'</button></div>';
+  app.innerHTML=h;
+  var inp=document.getElementById("inp");
+  if(inp&&q.t==="isian")inp.onkeydown=function(e){if(e.key==="Enter")periksa();};
+  window.scrollTo(0,0);
+}
+
+function norm(s){return String(s).toLowerCase().replace(/[\u2212\u2013]/g,"-").replace(/;/g,",").replace(/[^0-9,\-.]/g,"");}
+
+function teksKunci(q){
+  if(q.t==="pg")return q.opsi[q.kunci];
+  if(q.t==="pgk")return q.kunci.map(function(i){return q.opsi[i];}).join("; ");
+  if(q.t==="bs")return q.kunci?"Benar":"Salah";
+  if(q.t==="jodoh")return q.kiri.map(function(l,r){return l+" \u2192 "+q.kanan[q.kunci[r]];}).join("; ");
+  if(q.t==="isian")return q.kunci[0];
+  return q.contoh;
+}
+function teksUser(q){
+  if(q.t==="pg")return q.opsi[st.sel];
+  if(q.t==="pgk")return st.set.slice().sort().map(function(i){return q.opsi[i];}).join("; ");
+  if(q.t==="bs")return st.bs?"Benar":"Salah";
+  if(q.t==="jodoh")return q.kiri.map(function(l,r){return l+" \u2192 "+q.kanan[st.map[r]];}).join("; ");
+  return st.teks;
+}
+
+function periksa(){
+  if(done)return;
+  var q=SOAL[cur],msg=document.getElementById("msg"),benar=false,info="",inp=document.getElementById("inp"),i;
+  msg.textContent="";
+  if(q.t==="pgk"){
+    if(!st.set.length){msg.textContent="Pilih minimal satu jawaban dulu.";return;}
+    benar=(st.set.slice().sort().join(",")===q.kunci.slice().sort().join(","));
+  }else if(q.t==="jodoh"){
+    for(i=0;i<q.kiri.length;i++){if(st.map[i]===undefined){msg.textContent="Isi semua baris dulu.";return;}}
+    benar=q.kiri.every(function(l,r){return st.map[r]===q.kunci[r];});
+  }else if(q.t==="isian"){
+    st.teks=inp.value.trim();
+    if(!st.teks){msg.textContent="Tulis jawabanmu dulu.";return;}
+    var n=norm(st.teks);
+    benar=q.kunci.some(function(k){return norm(k)===n;});
+    inp.readOnly=true;
+  }else if(q.t==="uraian"){
+    st.teks=inp.value.trim();
+    if(!st.teks){msg.textContent="Tulis jawabanmu dulu.";return;}
+    var low=st.teks.toLowerCase(),hit=0,found=[];
+    q.kata.forEach(function(g){
+      var m=g.filter(function(w){return low.indexOf(w)>-1;});
+      if(m.length){hit++;found.push(m[0]);}
+    });
+    benar=hit>=q.min;
+    info='<p>Kata kunci yang ditemukan: <b>'+(found.length?esc(found.join(", ")):"belum ada")+'</b> ('+hit+' dari '+q.kata.length+' kelompok, perlu '+q.min+').</p>';
+    inp.readOnly=true;
+  }
+  selesai(q,benar,info);
+}
+
+function selesai(q,benar,info){
+  done=true;
+  if(benar)skor++;else salah.push({i:cur,u:teksUser(q)});
+  document.getElementById("sk").textContent="Skor: "+skor;
+  if(q.t==="pg")qa(".opt").forEach(function(b){var i=+b.dataset.i;if(i===q.kunci)b.classList.add("ok");else if(i===st.sel)b.classList.add("bad");b.classList.add("kunci");});
+  if(q.t==="pgk")qa(".opt").forEach(function(b){var i=+b.dataset.k,ben=q.kunci.indexOf(i)>-1,pil=st.set.indexOf(i)>-1;b.classList.remove("pilih");if(ben)b.classList.add("ok");else if(pil)b.classList.add("bad");b.classList.add("kunci");});
+  if(q.t==="bs")qa(".opt").forEach(function(b){var v=b.dataset.v==="1";if(v===q.kunci)b.classList.add("ok");else if(v===st.bs)b.classList.add("bad");b.classList.add("kunci");});
+  if(q.t==="jodoh")qa(".chip").forEach(function(b){var r=+b.dataset.r,c=+b.dataset.c;b.classList.remove("pilih");if(c===q.kunci[r])b.classList.add("ok");else if(c===st.map[r])b.classList.add("bad");b.classList.add("kunci");});
+  var cek=document.getElementById("cek");if(cek)cek.classList.add("hide");
+  var fb='<div class="fb '+(benar?"ok":"bad")+'" role="status"><b>'+(benar?"Benar \u2713":"Belum tepat \u2717")+'</b>'+info;
+  if(!benar)fb+='<p>Jawaban yang tepat: <b>'+esc(teksKunci(q))+'</b></p>';
+  fb+='<p><b>Pembahasan:</b> '+q.bahas+'</p></div>';
+  document.getElementById("fb").innerHTML=fb;
+  var nx=document.getElementById("nx");nx.classList.remove("hide");nx.focus();
+}
+
+function akhir(){
+  document.getElementById("no").textContent="Selesai";
+  document.getElementById("pb").style.width="100%";
+  var n=SOAL.length,pct=Math.round(skor/n*100);
+  var kata=pct>=80?"Hebat sekali!":(pct>=60?"Bagus! Terus berlatih.":"Ayo coba lagi. Kamu pasti bisa.");
+  var h='<div class="card"><h2>Hasil Kuis</h2><div class="skor">'+skor+' / '+n+'</div><p style="text-align:center"><b>Nilai: '+pct+'. '+kata+'</b></p>';
+  if(salah.length){
+    h+='<h2>Soal yang perlu dipelajari lagi</h2>';
+    salah.forEach(function(s){
+      var q=SOAL[s.i];
+      h+='<div class="salah"><b>Soal '+(s.i+1)+'.</b> '+q.q+'<p>Jawabanmu: <b>'+esc(s.u)+'</b></p><p>Jawaban tepat: <b>'+esc(teksKunci(q))+'</b></p><p><b>Pembahasan:</b> '+q.bahas+'</p></div>';
+    });
+  }else{
+    h+='<p style="text-align:center"><b>Semua soal benar. Luar biasa!</b></p>';
+  }
+  h+='<button class="main" id="ulang" style="width:100%">Ulangi</button></div>';
+  app.innerHTML=h;
+  window.scrollTo(0,0);
+}
+
+app.addEventListener("click",function(e){
+  var b=e.target.closest("button");
+  if(!b)return;
+  var q=SOAL[cur];
+  if(b.id==="cek"){periksa();return;}
+  if(b.id==="nx"){cur++;if(cur>=SOAL.length)akhir();else tampil();return;}
+  if(b.id==="ulang"){cur=0;skor=0;salah=[];tampil();return;}
+  if(done)return;
+  if(q.t==="pg"&&b.dataset.i!==undefined){st.sel=+b.dataset.i;selesai(q,st.sel===q.kunci,"");}
+  else if(q.t==="bs"&&b.dataset.v!==undefined){st.bs=b.dataset.v==="1";selesai(q,st.bs===q.kunci,"");}
+  else if(q.t==="pgk"&&b.dataset.k!==undefined){
+    var k=+b.dataset.k,p=st.set.indexOf(k);
+    if(p>-1)st.set.splice(p,1);else st.set.push(k);
+    b.classList.toggle("pilih",p===-1);
+    b.setAttribute("aria-pressed",p===-1);
+  }else if(q.t==="jodoh"&&b.dataset.c!==undefined){
+    var r=+b.dataset.r,c=+b.dataset.c;
+    st.map[r]=c;
+    qa('.chip[data-r="'+r+'"]').forEach(function(x){x.classList.toggle("pilih",+x.dataset.c===c);});
+  }
+});
+
+tampil();
+</script>
+</body>
+</html>
